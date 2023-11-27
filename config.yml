@@ -1,0 +1,24 @@
+app:
+  Address: "0.0.0.0:8000"
+  AppBaseUrl: ""
+  Cors: ""
+
+database:
+  driver: "postgres"
+  host: "db.arksmzmcvccxmlxobtsj.supabase.co"
+  port: "5432"
+  username: "postgres"
+  password: "bY3RRfgK1Ow53o5s"
+  database: "postgres"
+
+mongodb:
+  username: "chulanpro5"
+  password: "1ZzBkOqdKoaqdPRw"
+  clusterURL: "cluster0.19w9hq2.mongodb.net"
+  databaseName: "YourDatabaseName"
+  options: "?retryWrites=true&w=majority"
+
+redis:
+  host: "localhost"
+  port: "6379"
+  password: ""
