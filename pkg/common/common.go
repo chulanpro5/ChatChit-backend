@@ -1,10 +1,9 @@
 package common
 
 import (
-	"test-chat/internal/config"
-	"test-chat/internal/db/mongodb"
-	"test-chat/internal/db/postgres"
-	"test-chat/internal/redis"
+	"test-chat/config"
+	"test-chat/pkg/db/postgres"
+	"test-chat/pkg/redis"
 )
 
 var common *Common
@@ -12,7 +11,6 @@ var common *Common
 type Common struct {
 	Config   *config.Config
 	Database *postgres.Database
-	MongoDb  *mongodb.MongoDb
 	Redis    *redis.Client
 }
 
@@ -27,11 +25,6 @@ func NewCommon() *Common {
 		panic(err)
 	}
 
-	mongoDb, err := mongodb.NewMongoDb(appConfig)
-	if err != nil {
-		panic(err)
-	}
-
 	redisClient, err := redis.NewRedisClient(appConfig)
 	if err != nil {
 		panic(err)
@@ -40,7 +33,6 @@ func NewCommon() *Common {
 	common = &Common{
 		appConfig,
 		db,
-		mongoDb,
 		redisClient,
 	}
 	return common

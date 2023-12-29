@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	GoRedis "github.com/redis/go-redis/v9"
-	"test-chat/internal/config"
+	"test-chat/config"
 )
 
 type Client struct {

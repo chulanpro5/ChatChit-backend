@@ -6,8 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"test-chat/internal/config"
-	"test-chat/internal/entity"
+	"test-chat/config"
+	"test-chat/pkg/entity"
 )
 
 type MongoDb struct {

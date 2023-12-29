@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
-	"test-chat/internal/client"
-	"test-chat/internal/common"
-	"test-chat/internal/entity"
-	"test-chat/internal/redis"
+	"test-chat/internal/old-client"
+	"test-chat/pkg/common"
+	"test-chat/pkg/entity"
+	"test-chat/pkg/redis"
 )
 
 type BroadcasterService struct {
 	common        *common.Common
 	redis         *redis.Client
-	clientService *client.ClientService
+	clientService *old_client.ClientService
 }
 
 func NewBroadcasterService(common *common.Common) *BroadcasterService {
@@ -25,7 +25,7 @@ func NewBroadcasterService(common *common.Common) *BroadcasterService {
 	return &BroadcasterService{
 		common:        common,
 		redis:         redisClient,
-		clientService: client.NewClientService(common),
+		clientService: old_client.NewClientService(common),
 	}
 }
 

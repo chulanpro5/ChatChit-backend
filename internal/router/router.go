@@ -2,12 +2,12 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"test-chat/internal/client"
+	"test-chat/internal/old-client"
 )
 
 var r *gin.Engine
 
-func InitRouter(clientHandler *client.Handler) {
+func InitRouter(clientHandler *old_client.Handler) {
 	r = gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})

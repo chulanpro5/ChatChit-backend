@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"test-chat/internal/config"
-	"test-chat/internal/entity"
+	"test-chat/config"
+	entity2 "test-chat/pkg/entity"
 )
 
 type Database struct {
@@ -28,7 +28,7 @@ func NewDatabase(config *config.Config) (*Database, error) {
 }
 
 func (db *Database) Migrate() error {
-	err := db.AutoMigrate(&entity.User{}, &entity.Room{})
+	err := db.AutoMigrate(&entity2.User{}, &entity2.Room{})
 	if err != nil {
 		return err
 	}

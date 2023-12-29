@@ -1,12 +1,12 @@
-package client
+package old_client
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
-	"test-chat/internal/common"
-	"test-chat/internal/entity"
+	"test-chat/pkg/common"
+	"test-chat/pkg/entity"
 
 	"github.com/gorilla/websocket"
 )

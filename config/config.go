@@ -8,7 +8,6 @@ import (
 type Config struct {
 	App      App
 	Database Database
-	MongoDb  MongoDb
 	Redis    Redis
 }
 

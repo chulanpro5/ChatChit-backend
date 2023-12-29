@@ -1,59 +1,68 @@
 package client
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
-	"go.uber.org/zap"
-	"net/http"
-	"test-chat/internal/common"
-	"test-chat/internal/entity"
+	"github.com/gofiber/contrib/websocket"
+	"github.com/gofiber/fiber/v2"
+	"log"
+	"test-chat/internal/auth"
+	"test-chat/pkg/common"
 )
 
-type Handler struct {
-	common        *common.Common
-	clientService *ClientService
+func NewClientRouter(router fiber.Router) {
+	handler := NewClientHandler(common.GetCommon())
+
+	clientRouter := router.Group("/client")
+	clientRouter.Get("/ws/connect", handler.authService.Middleware, upgrade, handler.Connect)
 }
 
-func NewHandler(common *common.Common) *Handler {
-	return &Handler{
-		common:        common,
-		clientService: NewClientService(common),
+type ClientHandler struct {
+	common      *common.Common
+	authService *auth.Service
+}
+
+func NewClientHandler(common *common.Common) *ClientHandler {
+	return &ClientHandler{
+		common:      common,
+		authService: auth.NewAuthService(common),
 	}
 }
 
-var upgrade = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+func upgrade(ctx *fiber.Ctx) error {
+	// IsWebSocketUpgrade returns true if the client
+	// requested upgrade to the WebSocket protocol.
+	if websocket.IsWebSocketUpgrade(ctx) {
+		ctx.Locals("allowed", true)
+		return ctx.Next()
+	}
+	return fiber.ErrUpgradeRequired
 }
 
-func (h *Handler) Connect(c *gin.Context) {
-	// TODO: auth
-	conn, err := upgrade.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+func (h *ClientHandler) Connect(ctx *fiber.Ctx) error {
+	return nil
+}
+
+func handleWebSocketConnection(c *websocket.Conn) {
+	log.Println(c.Locals("allowed"))  // true
+	log.Println(c.Params("id"))       // 123
+	log.Println(c.Query("v"))         // 1.0
+	log.Println(c.Cookies("session")) // ""
+
+	var (
+		mt  int
+		msg []byte
+		err error
+	)
+
+	for {
+		if mt, msg, err = c.ReadMessage(); err != nil {
+			log.Println("read:", err)
+			break
+		}
+		log.Printf("recv: %s", msg)
+
+		if err = c.WriteMessage(mt, msg); err != nil {
+			log.Println("write:", err)
+			break
+		}
 	}
-
-	// TODO: get info from auth
-	clientId := c.Query("id")
-
-	zap.L().Debug(fmt.Sprintf("Client %s connected", clientId))
-
-	cl := &Client{
-		Common:  h.common,
-		Conn:    conn,
-		Message: make(chan *entity.Message, 10),
-		Id:      clientId,
-	}
-
-	h.clientService.hub.AddClient(cl.Id, cl)
-	zap.L().Debug(fmt.Sprintf("Client %s registered", cl.Id))
-
-	go cl.writeMessage()
-	go cl.readMessage(h.clientService.hub)
-	zap.L().Debug(fmt.Sprintf("Client %s started listening", cl.Id))
 }

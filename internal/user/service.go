@@ -1,51 +1,22 @@
 package user
 
 import (
-	"test-chat/internal/db/postgres"
-	"test-chat/internal/entity"
+	"test-chat/pkg/common"
+	"test-chat/pkg/entity"
 )
 
-type UserService struct {
-	db *postgres.Database
+type Service struct {
+	common *common.Common
 }
 
-func NewUserService() *UserService {
-	return &UserService{db: postgres.GetDatabase()}
-}
-
-func (rs *UserService) CreateUser(name string) (entity.User, error) {
-	user := entity.User{
-		ID:       0,
-		Username: name,
+func NewUserService(common *common.Common) *Service {
+	return &Service{
+		common: common,
 	}
-
-	result := rs.db.Create(&user)
-	if result.Error != nil {
-		return entity.User{}, result.Error
-	}
-
-	return user, nil
 }
 
-func (rs *UserService) GetUser(id uint) (entity.User, error) {
+func (s *Service) GetUser(userId string) (entity.User, error) {
 	var user entity.User
-
-	result := rs.db.First(&user, id)
-	if result.Error != nil {
-		return entity.User{}, result.Error
-	}
-
-	return user, nil
-}
-
-func (rs *UserService) GetUserByRoomID(RoomID uint) (entity.User, error) {
-	var users []entity.User
-
-	result := rs.db.Model(&entity.Room{}).Where("id = ?", RoomID).Association("Users").Find(&users)
-
-	if result.Error != nil {
-		return entity.User{}, nil
-	}
-
-	return users[0], nil
+	result := s.common.Database.Where("id = ?", userId).First(&user)
+	return user, result.Error
 }

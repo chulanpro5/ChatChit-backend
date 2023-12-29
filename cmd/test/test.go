@@ -3,9 +3,9 @@ package main
 import (
 	"go.uber.org/zap"
 	"test-chat/internal/broadcaster"
-	"test-chat/internal/client"
-	"test-chat/internal/common"
+	"test-chat/internal/old-client"
 	"test-chat/internal/router"
+	"test-chat/pkg/common"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 	//}
 	//fmt.Println(users)
 
-	clientHandler := client.NewHandler(common.GetCommon())
+	clientHandler := old_client.NewHandler(common.GetCommon())
 
 	broadcaster := broadcaster.NewBroadcasterService(common.GetCommon())
 	go broadcaster.Run()

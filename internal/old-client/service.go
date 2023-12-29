@@ -1,11 +1,11 @@
-package client
+package old_client
 
 import (
 	"fmt"
-	"test-chat/internal/common"
-	"test-chat/internal/entity"
 	"test-chat/internal/room"
-	"test-chat/internal/util"
+	"test-chat/pkg/common"
+	"test-chat/pkg/entity"
+	"test-chat/pkg/util"
 )
 
 type ClientService struct {
@@ -23,7 +23,7 @@ func NewClientService(common *common.Common) *ClientService {
 }
 
 func (c *ClientService) BroadcastMessage(message *entity.Message) error {
-	// Find the client with the given id
+	// Find the old-client with the given id
 	fmt.Println("BroadcastToRoom")
 	fmt.Println(message)
 
@@ -36,14 +36,14 @@ func (c *ClientService) BroadcastMessage(message *entity.Message) error {
 	for _, receiver := range receivers {
 		fmt.Println(receiver)
 		receiverID, _ := util.UIntToStr(receiver.ID)
-		// Get the client from the hub
+		// Get the old-client from the hub
 		receiverClient, err := c.hub.GetClient(receiverID)
 		fmt.Println(receiverClient)
 
 		if err != nil {
 			return err
 		}
-		fmt.Println("Sending message to client")
+		fmt.Println("Sending message to old-client")
 		receiverClient.Message <- message
 	}
 

@@ -1,9 +1,10 @@
 package room
 
 import (
-	"test-chat/internal/common"
-	"test-chat/internal/entity"
-	"test-chat/internal/util"
+	"fmt"
+	"test-chat/pkg/common"
+	"test-chat/pkg/entity"
+	"test-chat/pkg/util"
 )
 
 type RoomService struct {
@@ -14,63 +15,114 @@ func NewRoomService(common *common.Common) *RoomService {
 	return &RoomService{common: common}
 }
 
-func (rs *RoomService) CreateRoom(name string) (entity.Room, error) {
+func (s *RoomService) CreateRoom(userId string, dto CreateRoomRequest) (entity.Room, error) {
 	room := entity.Room{
-		ID:   0,
-		Name: name,
+		Name: dto.Name,
 	}
 
-	result := rs.common.Database.Create(&room)
-	if result.Error != nil {
-		return entity.Room{}, result.Error
+	err := s.common.Database.DB.Create(&room).Error
+	if err != nil {
+		return room, err
+	}
+
+	// Add room creator as member
+	err = s.AddMember(userId, fmt.Sprint(room.ID))
+	if err != nil {
+		return room, err
 	}
 
 	return room, nil
 }
 
-func (rs *RoomService) GetRoom(id uint) (entity.Room, error) {
+func (s *RoomService) GetRoom(userId string, roomId string) (entity.Room, error) {
 	var room entity.Room
 
-	result := rs.common.Database.First(&room, id)
-	if result.Error != nil {
-		return entity.Room{}, result.Error
+	err := s.common.Database.DB.
+		Table("rooms").
+		Joins("JOIN room_members ON room_members.room_id = rooms.id").
+		Where("room_members.user_id = ? AND room_members.room_id = ?", userId, roomId).
+		First(&room).Error
+
+	if err != nil {
+		return room, err
 	}
 
 	return room, nil
 }
 
-func (rs *RoomService) GetRoomsByUserID(userID uint) ([]entity.Room, error) {
+func (s *RoomService) GetRooms(userId string) ([]entity.Room, error) {
 	var rooms []entity.Room
 
-	strUserID, _ := util.UIntToStr(userID)
-	result := rs.common.Database.Where("id IN (SELECT room_id FROM user_rooms WHERE user_id = ?)", strUserID).Find(&rooms)
+	err := s.common.Database.DB.
+		Table("rooms").
+		Joins("JOIN room_members ON room_members.room_id = rooms.id").
+		Where("room_members.user_id = ?", userId).
+		Find(&rooms).Error
 
-	if result.Error != nil {
-		return []entity.Room{}, nil
+	if err != nil {
+		return nil, err
 	}
 
 	return rooms, nil
 }
 
-func (rs *RoomService) GetUsersByRoomID(roomID uint) ([]entity.User, error) {
-	var users []entity.User
-	strRoomID, _ := util.UIntToStr(roomID)
-	result := rs.common.Database.Where("id IN (SELECT user_id FROM user_rooms WHERE room_id = ?)", strRoomID).Find(&users)
-	if result.Error != nil {
-		return []entity.User{}, result.Error
+func (s *RoomService) GetMembers(roomId string) ([]entity.User, error) {
+	var members []entity.User
+
+	err := s.common.Database.DB.
+		Table("users").
+		Joins("JOIN room_members ON room_members.user_id = users.id").
+		Where("room_members.room_id = ?", roomId).
+		Find(&members).Error
+
+	if err != nil {
+		return nil, err
 	}
 
-	return users, nil
+	return members, nil
 }
 
-func (rs *RoomService) AddUserToRoom(userID uint, roomID uint) error {
-	var user entity.User
-	var room entity.Room
+func (s *RoomService) AddMember(userIdString string, roomIdString string) error {
+	userId, err := util.StrToUInt(userIdString)
+	if err != nil {
+		return err
+	}
 
-	rs.common.Database.First(&user, userID)
-	rs.common.Database.First(&room, roomID)
+	roomId, err := util.StrToUInt(roomIdString)
+	if err != nil {
+		return err
+	}
 
-	result := rs.common.Database.Model(&room).Association("Members").Append(&user)
+	roomMember := entity.RoomMember{
+		RoomId: roomId,
+		UserId: userId,
+	}
 
-	return result
+	err = s.common.Database.DB.Create(&roomMember).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *RoomService) RemoveMember(userIdString string, roomIdString string) error {
+	userId, err := util.StrToUInt(userIdString)
+	if err != nil {
+		return err
+	}
+
+	roomId, err := util.StrToUInt(roomIdString)
+	if err != nil {
+		return err
+	}
+
+	err = s.common.Database.DB.
+		Where("user_id = ? AND room_id = ?", userId, roomId).
+		Delete(&entity.RoomMember{}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
