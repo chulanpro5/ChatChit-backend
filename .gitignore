@@ -1,0 +1,11 @@
+.idea
+.env
+tmp
+
+config.yml
+
+vendor
+
+.docker
+
+bin/
