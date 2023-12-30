@@ -2,8 +2,15 @@
 
 ## Prerequisites
 - Docker
-- Go
 
+
+## Build and run docker compose
+
+```bash
+docker compose -f build/docker-compose.yml up -d
+```
+
+## Or
 ## Setup Development Environment
 
 ```bash
