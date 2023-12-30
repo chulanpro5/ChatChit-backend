@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: ./build/Dockerfile
+    networks:
+      - chatchit-network
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../config.yml:/app/config.yml
+    command: [ "/app/main" ]
+    restart: on-failure
+
+  redis:
+    image: redis
+    container_name: chatchit-redis
+    restart: unless-stopped
+    networks:
+      - chatchit-network
+    volumes:
+      - ./.docker/data/redis:/data
+    ports:
+      - "6379:6379"
+    command: redis-server
+
+networks:
+  chatchit-network:
+    external: true

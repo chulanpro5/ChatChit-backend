@@ -2,7 +2,7 @@ package response
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 )
 
 type Messsage struct {
@@ -23,7 +23,7 @@ func SendValidationError(ctx *fiber.Ctx, errs map[string]string) error {
 }
 
 func ErrorHandler(ctx *fiber.Ctx, err error) error {
-	logrus.Error(err)
+	zap.L().Error(err.Error())
 	code := fiber.StatusInternalServerError
 
 	if e, ok := err.(*fiber.Error); ok {

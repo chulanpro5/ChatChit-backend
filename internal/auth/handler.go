@@ -16,19 +16,19 @@ func NewAuthRouter(router fiber.Router) {
 	authRouter.Post("/logout", handler.authService.Middleware, handler.Logout)
 }
 
-type AuthHandler struct {
+type Handler struct {
 	common      *common.Common
 	authService *Service
 }
 
-func NewAuthHandler(common *common.Common) *AuthHandler {
-	return &AuthHandler{
+func NewAuthHandler(common *common.Common) *Handler {
+	return &Handler{
 		common:      common,
 		authService: NewAuthService(common),
 	}
 }
 
-func (h *AuthHandler) Register(ctx *fiber.Ctx) error {
+func (h *Handler) Register(ctx *fiber.Ctx) error {
 	body := new(RegisterRequest)
 	if err := ctx.BodyParser(body); err != nil {
 		return err
@@ -42,7 +42,7 @@ func (h *AuthHandler) Register(ctx *fiber.Ctx) error {
 	return response.SendSuccess(ctx, resp)
 }
 
-func (h *AuthHandler) Login(ctx *fiber.Ctx) error {
+func (h *Handler) Login(ctx *fiber.Ctx) error {
 	body := new(LoginRequest)
 	if err := ctx.BodyParser(body); err != nil {
 		return err
@@ -50,7 +50,7 @@ func (h *AuthHandler) Login(ctx *fiber.Ctx) error {
 
 	cookie, err := h.authService.Login(*body)
 	if err != nil {
-		return err
+		return response.BadRequest(ctx, err, nil)
 	}
 
 	ctx.Cookie(&cookie)
@@ -58,7 +58,7 @@ func (h *AuthHandler) Login(ctx *fiber.Ctx) error {
 	return response.SendSuccess(ctx, nil)
 }
 
-func (h *AuthHandler) Logout(ctx *fiber.Ctx) error {
+func (h *Handler) Logout(ctx *fiber.Ctx) error {
 	cookie, err := h.authService.Logout(fmt.Sprint(ctx.Locals("userId")))
 	if err != nil {
 		return err

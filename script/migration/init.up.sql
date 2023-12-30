@@ -30,8 +30,17 @@ CREATE TABLE messages (
                             created_at TIMESTAMP WITH TIME ZONE NOT NULL,
                             updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
                             deleted_at TIMESTAMP WITH TIME ZONE,
-                            user_id INTEGER,
+                            sender_id INTEGER,
                             room_id INTEGER,
-                            metadata TEXT UNIQUE NOT NULL,
+                            metadata TEXT NULL DEFAULT NULL,
                             content TEXT
+);
+
+CREATE TABLE friendships (
+                              id SERIAL PRIMARY KEY,
+                              created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                              updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                              deleted_at TIMESTAMP WITH TIME ZONE,
+                              user_id INTEGER,
+                              friend_id INTEGER
 );

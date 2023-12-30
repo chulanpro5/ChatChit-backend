@@ -7,15 +7,15 @@ import (
 	"test-chat/pkg/util"
 )
 
-type RoomService struct {
+type Service struct {
 	common *common.Common
 }
 
-func NewRoomService(common *common.Common) *RoomService {
-	return &RoomService{common: common}
+func NewRoomService(common *common.Common) *Service {
+	return &Service{common: common}
 }
 
-func (s *RoomService) CreateRoom(userId string, dto CreateRoomRequest) (entity.Room, error) {
+func (s *Service) CreateRoom(userId string, dto CreateRoomRequest) (entity.Room, error) {
 	room := entity.Room{
 		Name: dto.Name,
 	}
@@ -34,7 +34,7 @@ func (s *RoomService) CreateRoom(userId string, dto CreateRoomRequest) (entity.R
 	return room, nil
 }
 
-func (s *RoomService) GetRoom(userId string, roomId string) (entity.Room, error) {
+func (s *Service) GetRoom(userId string, roomId string) (entity.Room, error) {
 	var room entity.Room
 
 	err := s.common.Database.DB.
@@ -50,7 +50,7 @@ func (s *RoomService) GetRoom(userId string, roomId string) (entity.Room, error)
 	return room, nil
 }
 
-func (s *RoomService) GetRooms(userId string) ([]entity.Room, error) {
+func (s *Service) GetRooms(userId string) ([]entity.Room, error) {
 	var rooms []entity.Room
 
 	err := s.common.Database.DB.
@@ -66,7 +66,7 @@ func (s *RoomService) GetRooms(userId string) ([]entity.Room, error) {
 	return rooms, nil
 }
 
-func (s *RoomService) GetMembers(roomId string) ([]entity.User, error) {
+func (s *Service) GetMembers(roomId string) ([]entity.User, error) {
 	var members []entity.User
 
 	err := s.common.Database.DB.
@@ -82,7 +82,7 @@ func (s *RoomService) GetMembers(roomId string) ([]entity.User, error) {
 	return members, nil
 }
 
-func (s *RoomService) AddMember(userIdString string, roomIdString string) error {
+func (s *Service) AddMember(userIdString string, roomIdString string) error {
 	userId, err := util.StrToUInt(userIdString)
 	if err != nil {
 		return err
@@ -106,7 +106,7 @@ func (s *RoomService) AddMember(userIdString string, roomIdString string) error 
 	return nil
 }
 
-func (s *RoomService) RemoveMember(userIdString string, roomIdString string) error {
+func (s *Service) RemoveMember(userIdString string, roomIdString string) error {
 	userId, err := util.StrToUInt(userIdString)
 	if err != nil {
 		return err

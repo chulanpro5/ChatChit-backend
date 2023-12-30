@@ -22,15 +22,15 @@ func NewRoomRouter(router fiber.Router) {
 	roomRouter.Get("/:id/list-members", handler.authService.Middleware, handler.GetMembers)
 }
 
-type RoomHandler struct {
+type Handler struct {
 	common      *common.Common
-	roomService *RoomService
+	roomService *Service
 	authService *auth.Service
 	userService *user.Service
 }
 
-func NewRoomHandler(common *common.Common) *RoomHandler {
-	return &RoomHandler{
+func NewRoomHandler(common *common.Common) *Handler {
+	return &Handler{
 		common:      common,
 		roomService: NewRoomService(common),
 		authService: auth.NewAuthService(common),
@@ -38,7 +38,7 @@ func NewRoomHandler(common *common.Common) *RoomHandler {
 	}
 }
 
-func (h *RoomHandler) CreateRoom(ctx *fiber.Ctx) error {
+func (h *Handler) CreateRoom(ctx *fiber.Ctx) error {
 	body := new(CreateRoomRequest)
 	if err := ctx.BodyParser(body); err != nil {
 		return err
@@ -52,7 +52,7 @@ func (h *RoomHandler) CreateRoom(ctx *fiber.Ctx) error {
 	return response.SendSuccess(ctx, room)
 }
 
-func (h *RoomHandler) GetRoom(ctx *fiber.Ctx) error {
+func (h *Handler) GetRoom(ctx *fiber.Ctx) error {
 	room, err := h.roomService.GetRoom(fmt.Sprint(ctx.Locals("userId")), ctx.Params("id"))
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (h *RoomHandler) GetRoom(ctx *fiber.Ctx) error {
 	return response.SendSuccess(ctx, room)
 }
 
-func (h *RoomHandler) GetRooms(ctx *fiber.Ctx) error {
+func (h *Handler) GetRooms(ctx *fiber.Ctx) error {
 	rooms, err := h.roomService.GetRooms(fmt.Sprint(ctx.Locals("userId")))
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func (h *RoomHandler) GetRooms(ctx *fiber.Ctx) error {
 	return response.SendSuccess(ctx, rooms)
 }
 
-func (h *RoomHandler) GetMembers(ctx *fiber.Ctx) error {
+func (h *Handler) GetMembers(ctx *fiber.Ctx) error {
 	members, err := h.roomService.GetMembers(ctx.Params("id"))
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (h *RoomHandler) GetMembers(ctx *fiber.Ctx) error {
 	return response.SendSuccess(ctx, members)
 }
 
-func (h *RoomHandler) AddMember(ctx *fiber.Ctx) error {
+func (h *Handler) AddMember(ctx *fiber.Ctx) error {
 	body := new(AddMemberRequest)
 	if err := ctx.BodyParser(body); err != nil {
 		return err
@@ -105,7 +105,7 @@ func (h *RoomHandler) AddMember(ctx *fiber.Ctx) error {
 	return response.SendSuccess(ctx, nil)
 }
 
-func (h *RoomHandler) RemoveMember(ctx *fiber.Ctx) error {
+func (h *Handler) RemoveMember(ctx *fiber.Ctx) error {
 	body := new(RemoveMemberRequest)
 	if err := ctx.BodyParser(body); err != nil {
 		return err

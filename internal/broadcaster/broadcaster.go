@@ -5,35 +5,35 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
-	"test-chat/internal/old-client"
+	"test-chat/internal/client"
 	"test-chat/pkg/common"
 	"test-chat/pkg/entity"
 	"test-chat/pkg/redis"
 )
 
-type BroadcasterService struct {
+type Service struct {
 	common        *common.Common
 	redis         *redis.Client
-	clientService *old_client.ClientService
+	clientService *client.Service
 }
 
-func NewBroadcasterService(common *common.Common) *BroadcasterService {
+func NewBroadcasterService(common *common.Common) *Service {
 	redisClient, err := redis.NewRedisClient(common.Config)
 	if err != nil {
 		panic(err)
 	}
-	return &BroadcasterService{
+	return &Service{
 		common:        common,
 		redis:         redisClient,
-		clientService: old_client.NewClientService(common),
+		clientService: client.NewClientService(common),
 	}
 }
 
-func (b *BroadcasterService) CleanUp() {
+func (b *Service) CleanUp() {
 	b.redis.CleanUp()
 }
 
-func (b *BroadcasterService) Run() {
+func (b *Service) Run() {
 	pubsub := b.redis.Client.Subscribe(context.Background(), "message")
 	defer pubsub.Close()
 
@@ -42,11 +42,16 @@ func (b *BroadcasterService) Run() {
 	for msg := range ch {
 		fmt.Println(msg.Channel, msg.Payload)
 		// parse message to JSON
-		var message entity.Message
+		var message entity.MessageResponse
 		err := json.Unmarshal([]byte(msg.Payload), &message)
 		if err != nil {
 			zap.L().Error(fmt.Sprintf("Error parsing message: %s", err.Error()))
 		}
-		b.clientService.BroadcastMessage(&message)
+
+		// Broadcast message to room
+		err = b.clientService.BroadcastMessage(&message)
+		if err != nil {
+			zap.L().Error(fmt.Sprintf("Error broadcasting message: %s", err.Error()))
+		}
 	}
 }

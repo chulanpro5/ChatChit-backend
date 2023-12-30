@@ -1,4 +1,4 @@
-package old_client
+package client
 
 import (
 	"errors"

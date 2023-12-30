@@ -16,21 +16,21 @@ func NewUserRouter(router fiber.Router) {
 	userRouter.Get("/", handler.authService.Middleware, handler.GetUser)
 }
 
-type UserHandler struct {
+type Handler struct {
 	common      *common.Common
 	userService *Service
 	authService *auth.Service
 }
 
-func NewUserHandler(common *common.Common) *UserHandler {
-	return &UserHandler{
+func NewUserHandler(common *common.Common) *Handler {
+	return &Handler{
 		common:      common,
 		userService: NewUserService(common),
 		authService: auth.NewAuthService(common),
 	}
 }
 
-func (h *UserHandler) GetUser(ctx *fiber.Ctx) error {
+func (h *Handler) GetUser(ctx *fiber.Ctx) error {
 	user, err := h.userService.GetUser(fmt.Sprint(ctx.Locals("userId")))
 	if err != nil {
 		return response.BadRequest(ctx, err, nil)
