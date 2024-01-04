@@ -3,7 +3,7 @@ services:
   api:
     build:
       context: ..
-      dockerfile: ./build/Dockerfile
+      dockerfile: ./api/Dockerfile
     networks:
       - chatchit-network
     ports:
@@ -11,6 +11,16 @@ services:
     volumes:
       - ../config.yml:/app/config.yml
     command: [ "/app/main" ]
+    restart: on-failure
+
+  translation:
+    build:
+      context: ../translation_service
+      dockerfile: ./Dockerfile
+    networks:
+      - chatchit-network
+    ports:
+      - "8040:8040"
     restart: on-failure
 
   redis:
