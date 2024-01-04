@@ -7,6 +7,7 @@
 ## Build and run docker compose
 
 ```bash
+docker network create -d chatchit-network
 docker compose -f build/docker-compose.yml up -d
 ```
 
