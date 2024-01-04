@@ -3,7 +3,7 @@ services:
   api:
     build:
       context: ..
-      dockerfile: ./api/Dockerfile
+      dockerfile: build/api/Dockerfile
     networks:
       - chatchit-network
     ports:
