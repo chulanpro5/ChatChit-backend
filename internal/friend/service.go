@@ -40,7 +40,7 @@ func (s *Service) GetFriends(userId string) ([]entity.UserResponse, error) {
 	err := s.common.Database.DB.
 		Table("users").
 		Joins("JOIN friendships ON friendships.friend_id = users.id").
-		Where("friendships.user_id = ?", userId).
+		Where("friendships.user_id = ? AND users.deleted_at IS NULL AND friendships.deleted_at IS NULL", userId).
 		Find(&friends).Error
 
 	if err != nil {
