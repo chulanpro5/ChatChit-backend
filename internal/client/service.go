@@ -42,7 +42,8 @@ func (c *Service) BroadcastMessage(message *entity.MessageResponse) error {
 		zap.L().Debug(fmt.Sprintf("Sending message to client: %s", fmt.Sprint(receiver.ID)))
 		receiverClient, err := c.hub.GetClient(fmt.Sprint(receiver.ID))
 		if err != nil {
-			return err
+			zap.L().Debug(fmt.Sprintf("Client not found: %s", err.Error()))
+			continue
 		}
 		receiverClient.Message <- message
 
