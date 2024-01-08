@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"test-chat/internal/room"
+	"test-chat/internal/user"
 	"test-chat/pkg/common"
 	"test-chat/pkg/entity"
 )
@@ -13,6 +14,7 @@ import (
 type Service struct {
 	common      *common.Common
 	roomService *room.Service
+	userService *user.Service
 	hub         *Hub
 }
 
@@ -20,12 +22,13 @@ func NewClientService(common *common.Common) *Service {
 	return &Service{
 		common:      common,
 		roomService: room.NewRoomService(common),
+		userService: user.NewUserService(common),
 		hub:         GetHubInstance(),
 	}
 }
 
 func (c *Service) BroadcastMessage(message *entity.MessageResponse) error {
-	// Find the old-client with the given id
+	// Find the client with the given id
 	fmt.Println("BroadcastToRoom")
 	fmt.Println(message)
 
@@ -36,6 +39,7 @@ func (c *Service) BroadcastMessage(message *entity.MessageResponse) error {
 	}
 
 	for _, receiver := range members {
+		zap.L().Debug(fmt.Sprintf("Sending message to client: %s", fmt.Sprint(receiver.ID)))
 		receiverClient, err := c.hub.GetClient(fmt.Sprint(receiver.ID))
 		if err != nil {
 			return err
@@ -56,12 +60,19 @@ func (c *Service) SendMessage(message *entity.MessageResponse) {
 		return
 	}
 
+	sender, err := c.userService.GetUser(fmt.Sprint(message.SenderId))
+	if err != nil {
+		zap.L().Info(fmt.Sprintf("Error getting user: %s", err.Error()))
+		return
+	}
+
 	// insert message to database
 	var msg = entity.Message{
 		RoomId:   message.RoomId,
 		Content:  message.Content,
 		SenderId: message.SenderId,
 		Metadata: message.Metadata,
+		User:     sender,
 	}
 	err = c.common.Database.DB.Create(&msg).Error
 	if err != nil {
@@ -69,10 +80,10 @@ func (c *Service) SendMessage(message *entity.MessageResponse) {
 		return
 	}
 
-	zap.L().Debug(fmt.Sprintf("Message inserted: %s", message))
+	zap.L().Debug(fmt.Sprintf("Message inserted: %s", msg))
 
 	// parse message to JSON
-	messageJson, err := json.Marshal(message)
+	messageJson, err := json.Marshal(msg)
 	if err != nil {
 		zap.L().Error(fmt.Sprintf("Error parsing message: %s", err.Error()))
 	}

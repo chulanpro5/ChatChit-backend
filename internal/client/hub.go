@@ -51,5 +51,5 @@ func (h *Hub) GetClient(id string) (*Client, error) {
 		return h.Clients[id], nil
 	}
 	zap.L().Debug("Client not found", zap.String("id", id))
-	return nil, errors.New("old-client not found")
+	return nil, errors.New("client not found")
 }
