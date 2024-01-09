@@ -69,11 +69,12 @@ func (c *Service) SendMessage(message *entity.Message) {
 
 	// insert message to database
 	var msg = entity.Message{
-		RoomId:   message.RoomId,
-		Content:  message.Content,
-		SenderId: message.SenderId,
-		Metadata: message.Metadata,
-		Sender:   *sender,
+		RoomId:    message.RoomId,
+		Content:   message.Content,
+		SenderId:  message.SenderId,
+		Metadata:  message.Metadata,
+		CreatedAt: message.CreatedAt,
+		Sender:    *sender,
 	}
 	err = c.common.Database.DB.Create(&msg).Error
 	if err != nil {
