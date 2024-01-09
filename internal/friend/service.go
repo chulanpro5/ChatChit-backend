@@ -2,19 +2,23 @@ package friend
 
 import (
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
+	"test-chat/internal/user"
 	"test-chat/pkg/common"
 	"test-chat/pkg/entity"
 	"test-chat/pkg/util"
 )
 
 type Service struct {
-	common *common.Common
+	common      *common.Common
+	userService *user.Service
 }
 
 func NewFriendService(common *common.Common) *Service {
 	return &Service{
-		common: common,
+		common:      common,
+		userService: user.NewUserService(common),
 	}
 }
 
@@ -28,7 +32,7 @@ func (s *Service) GetFriend(userId string, friendId string) (bool, error) {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return false, nil
 		} else {
-			return false, nil
+			return false, result.Error
 		}
 	}
 
@@ -115,4 +119,22 @@ func (s *Service) RemoveFriend(userIdString string, friendIdString string) error
 	}
 
 	return nil
+}
+
+func (s *Service) FindFriendByEmail(userId string, dto *FindUserByEmailRequest) (*user.Response, bool, error) {
+	friend, err := s.userService.FindUserByEmail(dto.Email)
+	if err != nil {
+		return friend, false, err
+	}
+
+	if friend == nil {
+		return friend, false, nil
+	}
+
+	isAdded, err := s.GetFriend(userId, fmt.Sprint(friend.ID))
+	if err != nil {
+		return friend, false, err
+	}
+
+	return friend, isAdded, nil
 }

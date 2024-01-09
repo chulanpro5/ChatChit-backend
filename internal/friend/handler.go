@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"test-chat/internal/auth"
+	"test-chat/internal/room"
 	"test-chat/pkg/common"
 	"test-chat/pkg/response"
 )
@@ -15,12 +16,14 @@ func NewFriendRouter(router fiber.Router) {
 	clientRouter.Get("/", handler.authService.Middleware, handler.GetFriends)
 	clientRouter.Post("/", handler.authService.Middleware, handler.AddFriend)
 	clientRouter.Delete("/:id", handler.authService.Middleware, handler.DeleteFriend)
+	clientRouter.Post("/find", handler.authService.Middleware, handler.FindUserByEmail)
 }
 
 type Handler struct {
 	common        *common.Common
 	friendService *Service
 	authService   *auth.Service
+	roomService   *room.Service
 }
 
 func NewFriendHandler(common *common.Common) *Handler {
@@ -28,6 +31,7 @@ func NewFriendHandler(common *common.Common) *Handler {
 		common:        common,
 		friendService: NewFriendService(common),
 		authService:   auth.NewAuthService(common),
+		roomService:   room.NewRoomService(common),
 	}
 }
 
@@ -90,4 +94,25 @@ func (h *Handler) DeleteFriend(ctx *fiber.Ctx) error {
 	}
 
 	return response.SendSuccess(ctx, nil)
+}
+
+func (h *Handler) FindUserByEmail(ctx *fiber.Ctx) error {
+	userId := ctx.Locals("userId")
+
+	body := new(FindUserByEmailRequest)
+	if err := ctx.BodyParser(body); err != nil {
+		return err
+	}
+
+	friend, isAdded, err := h.friendService.FindFriendByEmail(fmt.Sprint(userId), body)
+	if err != nil {
+		return response.BadRequest(ctx, err, nil)
+	}
+
+	fmt.Println(friend)
+
+	return response.SendSuccess(ctx, FindUserByEmailResponse{
+		IsFriendAdded: isAdded,
+		User:          friend,
+	})
 }
