@@ -19,8 +19,9 @@ func NewRoomService(common *common.Common) *Service {
 
 func (s *Service) CreateRoom(userId string, dto CreateRoomRequest, roomType string) (entity.Room, error) {
 	room := entity.Room{
-		Name: dto.Name,
-		Type: roomType,
+		Name:        dto.Name,
+		Type:        roomType,
+		ImageBase64: util.ImageToBase64(util.GenerateAvatar(dto.Name)),
 	}
 
 	err := s.common.Database.DB.Create(&room).Error

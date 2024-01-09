@@ -6,12 +6,13 @@ import (
 )
 
 type Room struct {
-	ID        uint           `gorm:"primarykey" json:"id"`
-	CreatedAt time.Time      `json:"-"`
-	UpdatedAt time.Time      `json:"-"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-	Name      string         `gorm:"unique" json:"name"`
-	Type      string         `json:"type"`
+	ID          uint           `gorm:"primarykey" json:"id"`
+	CreatedAt   time.Time      `json:"-"`
+	UpdatedAt   time.Time      `json:"-"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
+	Name        string         `gorm:"unique" json:"name"`
+	Type        string         `json:"type"`
+	ImageBase64 string         `json:"avatar"`
 }
 
 type RoomMember struct {

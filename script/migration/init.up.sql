@@ -5,7 +5,8 @@ CREATE TABLE users (
                        deleted_at TIMESTAMP WITH TIME ZONE,
                        name VARCHAR(255),
                        email VARCHAR(255) UNIQUE NOT NULL,
-                       password BYTEA
+                       password BYTEA,
+                       profile_image_base64 TEXT
 );
 
 CREATE TABLE rooms (
@@ -14,7 +15,8 @@ CREATE TABLE rooms (
                         updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
                         deleted_at TIMESTAMP WITH TIME ZONE,
                         name VARCHAR(255),
-                        type TEXT
+                        type TEXT,
+                        image_base64 TEXT
 );
 
 CREATE TABLE room_members (

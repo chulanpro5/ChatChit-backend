@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"test-chat/pkg/common"
 	"test-chat/pkg/entity"
+	"test-chat/pkg/util"
 	"time"
 )
 
@@ -27,9 +28,10 @@ func (s *Service) Register(dto RegisterRequest) (entity.User, error) {
 	password, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), 14) //GenerateFromPassword returns the bcrypt hash of the password at the given cost i.e.
 
 	user := entity.User{
-		Name:     dto.Name,
-		Email:    dto.Email,
-		Password: password,
+		Name:               dto.Name,
+		Email:              dto.Email,
+		Password:           password,
+		ProfileImageBase64: util.ImageToBase64(util.GenerateAvatar(dto.Email)),
 	}
 
 	s.common.Database.Create(&user)
