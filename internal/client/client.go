@@ -47,6 +47,10 @@ func (h *Handler) readMessage(c *Client, conn *websocket.Conn) {
 		}
 
 		// process message
+		if string(m) == "ping" {
+			c.Conn.WriteJSON("pong")
+			continue
+		}
 		var msgRequest SendMessageRequest
 		err = json.Unmarshal(m, &msgRequest)
 		if err != nil {
