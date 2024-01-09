@@ -5,9 +5,9 @@ type CreateRoomRequest struct {
 }
 
 type AddMemberRequest struct {
-	MemberId string `json:"userId"`
+	MemberId uint `json:"userId"`
 }
 
 type RemoveMemberRequest struct {
-	MemberId string `json:"userId"`
+	MemberId uint `json:"userId"`
 }

@@ -95,7 +95,7 @@ func (h *Handler) AddMember(ctx *fiber.Ctx) error {
 	}
 
 	// Check if user exists
-	userFound, err := h.userService.GetUser(body.MemberId)
+	userFound, err := h.userService.GetUser(fmt.Sprint(body.MemberId))
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (h *Handler) AddMember(ctx *fiber.Ctx) error {
 	}
 
 	// Check if user is already a member
-	member, err := h.roomService.GetMember(ctx.Params("id"), body.MemberId)
+	member, err := h.roomService.GetMember(ctx.Params("id"), fmt.Sprint(body.MemberId))
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (h *Handler) AddMember(ctx *fiber.Ctx) error {
 		return response.BadRequest(ctx, errors.New("user is already a member"), nil)
 	}
 
-	err = h.roomService.AddMember(body.MemberId, ctx.Params("id"))
+	err = h.roomService.AddMember(fmt.Sprint(body.MemberId), ctx.Params("id"))
 	if err != nil {
 		return err
 	}
@@ -155,7 +155,7 @@ func (h *Handler) RemoveMember(ctx *fiber.Ctx) error {
 	}
 
 	// Check if member exists
-	member, err := h.roomService.GetMember(fmt.Sprint(roomFound.ID), body.MemberId)
+	member, err := h.roomService.GetMember(fmt.Sprint(roomFound.ID), fmt.Sprint(body.MemberId))
 	if err != nil {
 		return err
 	}
@@ -164,7 +164,7 @@ func (h *Handler) RemoveMember(ctx *fiber.Ctx) error {
 		return response.BadRequest(ctx, errors.New("member or room not found"), nil)
 	}
 
-	err = h.roomService.RemoveMember(body.MemberId, ctx.Params("id"))
+	err = h.roomService.RemoveMember(fmt.Sprint(body.MemberId), ctx.Params("id"))
 	if err != nil {
 		return err
 	}
