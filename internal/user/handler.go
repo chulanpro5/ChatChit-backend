@@ -36,5 +36,9 @@ func (h *Handler) GetUser(ctx *fiber.Ctx) error {
 		return response.BadRequest(ctx, err, nil)
 	}
 
-	return response.SendSuccess(ctx, user)
+	return response.SendSuccess(ctx, &Response{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	})
 }
