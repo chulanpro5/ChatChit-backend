@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"sort"
 	"test-chat/pkg/common"
 	"test-chat/pkg/entity"
 	"test-chat/pkg/util"
@@ -57,29 +58,13 @@ func (s *Service) GetRoom(userId string, roomId string) (*entity.Room, error) {
 	return &room, nil
 }
 
-func (s *Service) GetGroups(userId string) ([]entity.Room, error) {
+func (s *Service) GetRooms(userId string) ([]WithLastMessage, error) {
 	var rooms []entity.Room
 
 	err := s.common.Database.DB.
 		Table("rooms").
 		Joins("JOIN room_members ON room_members.room_id = rooms.id").
-		Where("room_members.user_id = ? AND type = 'group' AND room_members.deleted_at IS NULL", userId).
-		Find(&rooms).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return rooms, nil
-}
-
-func (s *Service) GetFriendChats(userId string) ([]entity.Room, error) {
-	var rooms []entity.Room
-
-	err := s.common.Database.DB.
-		Table("rooms").
-		Joins("JOIN room_members ON room_members.room_id = rooms.id").
-		Where("room_members.user_id = ? AND rooms.type = 'private'", userId).
+		Where("room_members.user_id = ? AND room_members.deleted_at IS NULL", userId).
 		Find(&rooms).Error
 
 	if err != nil {
@@ -88,6 +73,9 @@ func (s *Service) GetFriendChats(userId string) ([]entity.Room, error) {
 
 	// For each room, assign friend name to room name
 	for i, room := range rooms {
+		if room.Type == "group" {
+			continue
+		}
 		member, err := s.GetFriendChatMember(userId, fmt.Sprint(room.ID))
 		if err != nil {
 			return nil, err
@@ -97,7 +85,57 @@ func (s *Service) GetFriendChats(userId string) ([]entity.Room, error) {
 		}
 	}
 
-	return rooms, nil
+	var roomsWithLastMessage []WithLastMessage
+
+	// For each room, get last message
+	for _, room := range rooms {
+		lastMessage, err := s.GetLastMessage(fmt.Sprint(room.ID))
+		if err != nil {
+			return nil, err
+		}
+		roomWithLastMessage := WithLastMessage{
+			ID:          room.ID,
+			Name:        room.Name,
+			Type:        room.Type,
+			ImageBase64: room.ImageBase64,
+			LastMessage: lastMessage,
+		}
+		roomsWithLastMessage = append(roomsWithLastMessage, roomWithLastMessage)
+	}
+
+	// Sort roomsWithLastMessage by LastMessage.CreatedAt
+	sort.Slice(roomsWithLastMessage, func(i, j int) bool {
+		// Handle cases where LastMessage is nil
+		if roomsWithLastMessage[i].LastMessage == nil {
+			return false
+		}
+		if roomsWithLastMessage[j].LastMessage == nil {
+			return true
+		}
+		return roomsWithLastMessage[i].LastMessage.CreatedAt.After(roomsWithLastMessage[j].LastMessage.CreatedAt)
+	})
+
+	return roomsWithLastMessage, nil
+}
+
+func (s *Service) GetLastMessage(roomId string) (*entity.Message, error) {
+	var message entity.Message
+
+	err := s.common.Database.DB.
+		Table("messages").
+		Where("room_id = ?", roomId).
+		Order("created_at DESC").
+		Preload("Sender").
+		First(&message).Error
+
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		return nil, nil
+	}
+
+	return &message, nil
 }
 
 func (s *Service) GetFriendChatMember(userId string, roomId string) (*entity.User, error) {

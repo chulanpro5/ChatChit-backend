@@ -73,7 +73,7 @@ func (c *Service) SendMessage(message *entity.Message) {
 		Content:  message.Content,
 		SenderId: message.SenderId,
 		Metadata: message.Metadata,
-		User:     *sender,
+		Sender:   *sender,
 	}
 	err = c.common.Database.DB.Create(&msg).Error
 	if err != nil {

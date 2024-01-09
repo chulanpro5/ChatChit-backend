@@ -15,8 +15,7 @@ func NewRoomRouter(router fiber.Router) {
 
 	roomRouter := router.Group("/room")
 	roomRouter.Post("/create", handler.authService.Middleware, handler.CreateRoom)
-	roomRouter.Get("/group", handler.authService.Middleware, handler.GetGroups)
-	roomRouter.Get("/friend-chat", handler.authService.Middleware, handler.GetFriendChats)
+	roomRouter.Get("/", handler.authService.Middleware, handler.GetRooms)
 
 	roomRouter.Post("/:id/add-member", handler.authService.Middleware, handler.AddMember)
 	roomRouter.Delete("/:id/remove-member", handler.authService.Middleware, handler.RemoveMember)
@@ -62,17 +61,8 @@ func (h *Handler) GetRoom(ctx *fiber.Ctx) error {
 	return response.SendSuccess(ctx, room)
 }
 
-func (h *Handler) GetGroups(ctx *fiber.Ctx) error {
-	rooms, err := h.roomService.GetGroups(fmt.Sprint(ctx.Locals("userId")))
-	if err != nil {
-		return err
-	}
-
-	return response.SendSuccess(ctx, rooms)
-}
-
-func (h *Handler) GetFriendChats(ctx *fiber.Ctx) error {
-	rooms, err := h.roomService.GetFriendChats(fmt.Sprint(ctx.Locals("userId")))
+func (h *Handler) GetRooms(ctx *fiber.Ctx) error {
+	rooms, err := h.roomService.GetRooms(fmt.Sprint(ctx.Locals("userId")))
 	if err != nil {
 		return err
 	}

@@ -29,21 +29,10 @@ func (s *Service) GetMessages(filter *GetMessagesFilter) ([]entity.Message, uint
 	}
 
 	var messages []entity.Message
-	err := query.Find(&messages).Error
+	err := query.Preload("Sender").Find(&messages).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
-	var messageResponses []entity.Message
-	for _, message := range messages {
-		messageResponses = append(messageResponses, entity.Message{
-			ID:       message.ID,
-			RoomId:   message.RoomId,
-			Content:  message.Content,
-			SenderId: message.SenderId,
-			Metadata: message.Metadata,
-		})
-	}
-
-	return messageResponses, uint64(totalItems), nil
+	return messages, uint64(totalItems), nil
 }

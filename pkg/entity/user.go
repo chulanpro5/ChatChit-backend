@@ -15,5 +15,5 @@ type User struct {
 	Password           []byte         `json:"-"`
 	ProfileImageBase64 string         `json:"avatar"`
 	LanguageId         uint           `json:"-"`
-	Language           Language       `gorm:"foreignKey:LanguageId" json:"language"`
+	Language           Language       `gorm:"foreignKey:LanguageId" json:"-"`
 }

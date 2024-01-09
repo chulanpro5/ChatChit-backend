@@ -64,7 +64,7 @@ func (h *Handler) readMessage(c *Client, conn *websocket.Conn) {
 			RoomId:   msgRequest.RoomId,
 			Content:  msgRequest.Content,
 			SenderId: senderId,
-			User: entity.User{
+			Sender: entity.User{
 				ID:    sender.ID,
 				Name:  sender.Name,
 				Email: sender.Email,
