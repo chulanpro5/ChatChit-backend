@@ -6,7 +6,8 @@ CREATE TABLE users (
                        name VARCHAR(255),
                        email VARCHAR(255) UNIQUE NOT NULL,
                        password BYTEA,
-                       profile_image_base64 TEXT
+                       profile_image_base64 TEXT,
+                       language_id INTEGER
 );
 
 CREATE TABLE rooms (

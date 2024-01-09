@@ -121,7 +121,7 @@ func (s *Service) RemoveFriend(userIdString string, friendIdString string) error
 	return nil
 }
 
-func (s *Service) FindFriendByEmail(userId string, dto *FindUserByEmailRequest) (*user.Response, bool, error) {
+func (s *Service) FindFriendByEmail(userId string, dto *FindUserByEmailRequest) (*entity.User, bool, error) {
 	friend, err := s.userService.FindUserByEmail(dto.Email)
 	if err != nil {
 		return friend, false, err

@@ -1,8 +1,10 @@
 package friend
 
-import "test-chat/internal/user"
+import (
+	"test-chat/pkg/entity"
+)
 
 type FindUserByEmailResponse struct {
-	IsFriendAdded bool           `json:"isFriendAdded"`
-	User          *user.Response `json:"user"`
+	IsFriendAdded bool         `json:"isFriendAdded"`
+	User          *entity.User `json:"user"`
 }

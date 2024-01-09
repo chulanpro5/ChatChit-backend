@@ -29,7 +29,7 @@ func (s *Service) GetUser(userId string) (*entity.User, error) {
 	return &user, nil
 }
 
-func (s *Service) FindUserByEmail(email string) (*Response, error) {
+func (s *Service) FindUserByEmail(email string) (*entity.User, error) {
 	var user entity.User
 	result := s.common.Database.Where("email = ?", email).First(&user)
 	if result.Error != nil {
@@ -39,9 +39,5 @@ func (s *Service) FindUserByEmail(email string) (*Response, error) {
 		return nil, nil
 	}
 
-	return &Response{
-		ID:    user.ID,
-		Name:  user.Name,
-		Email: user.Email,
-	}, nil
+	return &user, nil
 }
