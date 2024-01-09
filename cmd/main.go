@@ -9,6 +9,7 @@ import (
 	"test-chat/internal/broadcaster"
 	"test-chat/internal/client"
 	"test-chat/internal/friend"
+	"test-chat/internal/language"
 	"test-chat/internal/message"
 	"test-chat/internal/room"
 	"test-chat/internal/user"
@@ -45,6 +46,7 @@ func main() {
 	client.NewClientRouter(api)
 	message.NewMessageRouter(api)
 	friend.NewFriendRouter(api)
+	language.NewLanguageRouter(api)
 
 	err := app.Listen(c.Config.App.Address)
 	if err != nil {
