@@ -7,7 +7,3 @@ type CreateRoomRequest struct {
 type AddMemberRequest struct {
 	MemberId uint `json:"userId"`
 }
-
-type RemoveMemberRequest struct {
-	MemberId uint `json:"userId"`
-}

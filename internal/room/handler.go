@@ -18,7 +18,7 @@ func NewRoomRouter(router fiber.Router) {
 	roomRouter.Get("/", handler.authService.Middleware, handler.GetRooms)
 
 	roomRouter.Post("/:id/add-member", handler.authService.Middleware, handler.AddMember)
-	roomRouter.Delete("/:id/remove-member", handler.authService.Middleware, handler.RemoveMember)
+	roomRouter.Delete("/:id/remove-member/:memberId", handler.authService.Middleware, handler.RemoveMember)
 	roomRouter.Get("/:id/list-members", handler.authService.Middleware, handler.GetMembers)
 }
 
@@ -135,11 +135,6 @@ func (h *Handler) AddMember(ctx *fiber.Ctx) error {
 }
 
 func (h *Handler) RemoveMember(ctx *fiber.Ctx) error {
-	body := new(RemoveMemberRequest)
-	if err := ctx.BodyParser(body); err != nil {
-		return err
-	}
-
 	// Check if room exists
 	roomFound, err := h.roomService.GetRoom(fmt.Sprint(ctx.Locals("userId")), ctx.Params("id"))
 	if err != nil {
@@ -155,7 +150,7 @@ func (h *Handler) RemoveMember(ctx *fiber.Ctx) error {
 	}
 
 	// Check if member exists
-	member, err := h.roomService.GetMember(fmt.Sprint(roomFound.ID), fmt.Sprint(body.MemberId))
+	member, err := h.roomService.GetMember(fmt.Sprint(roomFound.ID), ctx.Params("memberId"))
 	if err != nil {
 		return err
 	}
@@ -164,7 +159,7 @@ func (h *Handler) RemoveMember(ctx *fiber.Ctx) error {
 		return response.BadRequest(ctx, errors.New("member or room not found"), nil)
 	}
 
-	err = h.roomService.RemoveMember(fmt.Sprint(body.MemberId), ctx.Params("id"))
+	err = h.roomService.RemoveMember(ctx.Params("memberId"), ctx.Params("id"))
 	if err != nil {
 		return err
 	}
