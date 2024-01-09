@@ -42,7 +42,7 @@ func (b *Service) Run() {
 	for msg := range ch {
 		fmt.Println(msg.Channel, msg.Payload)
 		// parse message to JSON
-		var message entity.MessageResponse
+		var message entity.Message
 		err := json.Unmarshal([]byte(msg.Payload), &message)
 		if err != nil {
 			zap.L().Error(fmt.Sprintf("Error parsing message: %s", err.Error()))

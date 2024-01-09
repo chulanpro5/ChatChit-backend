@@ -72,6 +72,20 @@ func (h *Handler) AddFriend(ctx *fiber.Ctx) error {
 		return err
 	}
 
+	// Create room
+	createdRoom, err := h.roomService.CreateRoom(fmt.Sprint(userId), room.CreateRoomRequest{
+		Name: "Private chat",
+	}, "private")
+	if err != nil {
+		return err
+	}
+
+	// Add friend to room
+	err = h.roomService.AddMember(fmt.Sprint(friendId.FriendId), fmt.Sprint(createdRoom.ID))
+	if err != nil {
+		return err
+	}
+
 	return response.SendSuccess(ctx, nil)
 }
 

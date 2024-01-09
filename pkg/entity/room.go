@@ -1,14 +1,24 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type Room struct {
-	gorm.Model
-	Name string `gorm:"unique" json:"name"`
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time      `json:"-"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	Name      string         `gorm:"unique" json:"name"`
+	Type      string         `json:"type"`
 }
 
 type RoomMember struct {
-	gorm.Model
-	RoomId uint `json:"roomId"`
-	UserId uint `json:"userId"`
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time      `json:"-"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	RoomId    uint           `json:"roomId"`
+	UserId    uint           `json:"userId"`
 }

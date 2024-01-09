@@ -2,7 +2,7 @@ package response
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"log"
+	"go.uber.org/zap"
 )
 
 func SendSuccess(ctx *fiber.Ctx, data interface{}) error {
@@ -35,11 +35,11 @@ func SendWithCode(ctx *fiber.Ctx, code int, message string, data interface{}, su
 }
 
 func Unauthorized(ctx *fiber.Ctx, err error) error {
-	log.Println(err)
+	zap.L().Info(err.Error())
 	return SendWithCode(ctx, fiber.StatusUnauthorized, "unauthorized", nil, false)
 }
 
 func BadRequest(ctx *fiber.Ctx, err error, data interface{}) error {
-	log.Println(err)
+	zap.L().Info(err.Error())
 	return SendWithCode(ctx, fiber.StatusBadRequest, "malformed data", data, false)
 }

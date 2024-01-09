@@ -39,7 +39,7 @@ func (s *Service) GetFriend(userId string, friendId string) (bool, error) {
 	return true, nil
 }
 
-func (s *Service) GetFriends(userId string) ([]entity.UserResponse, error) {
+func (s *Service) GetFriends(userId string) ([]entity.User, error) {
 	var friends []entity.User
 	err := s.common.Database.DB.
 		Table("users").
@@ -51,9 +51,9 @@ func (s *Service) GetFriends(userId string) ([]entity.UserResponse, error) {
 		return nil, err
 	}
 
-	var friendResponses []entity.UserResponse
+	var friendResponses []entity.User
 	for _, friend := range friends {
-		friendResponses = append(friendResponses, entity.UserResponse{
+		friendResponses = append(friendResponses, entity.User{
 			ID:    friend.ID,
 			Name:  friend.Name,
 			Email: friend.Email,

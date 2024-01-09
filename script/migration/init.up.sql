@@ -13,7 +13,8 @@ CREATE TABLE rooms (
                         created_at TIMESTAMP WITH TIME ZONE NOT NULL,
                         updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
                         deleted_at TIMESTAMP WITH TIME ZONE,
-                        name VARCHAR(255)
+                        name VARCHAR(255),
+                        type TEXT
 );
 
 CREATE TABLE room_members (

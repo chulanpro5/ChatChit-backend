@@ -13,7 +13,7 @@ import (
 type Client struct {
 	Common  *common.Common
 	Conn    *websocket.Conn
-	Message chan *entity.MessageResponse
+	Message chan *entity.Message
 	Id      string `json:"id"`
 }
 
@@ -60,11 +60,11 @@ func (h *Handler) readMessage(c *Client, conn *websocket.Conn) {
 			zap.L().Info(fmt.Sprintf("Error getting user: %s", err.Error()))
 		}
 
-		msg := &entity.MessageResponse{
+		msg := &entity.Message{
 			RoomId:   msgRequest.RoomId,
 			Content:  msgRequest.Content,
 			SenderId: senderId,
-			User: entity.UserResponse{
+			User: entity.User{
 				ID:    sender.ID,
 				Name:  sender.Name,
 				Email: sender.Email,

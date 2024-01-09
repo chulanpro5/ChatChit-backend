@@ -27,7 +27,7 @@ func NewClientService(common *common.Common) *Service {
 	}
 }
 
-func (c *Service) BroadcastMessage(message *entity.MessageResponse) error {
+func (c *Service) BroadcastMessage(message *entity.Message) error {
 	// Find the client with the given id
 	fmt.Println("BroadcastToRoom")
 	fmt.Println(message)
@@ -53,7 +53,7 @@ func (c *Service) BroadcastMessage(message *entity.MessageResponse) error {
 	return nil
 }
 
-func (c *Service) SendMessage(message *entity.MessageResponse) {
+func (c *Service) SendMessage(message *entity.Message) {
 	// Check if room exists
 	_, err := c.roomService.GetRoom(fmt.Sprint(message.SenderId), fmt.Sprint(message.RoomId))
 	if err != nil {
@@ -73,7 +73,7 @@ func (c *Service) SendMessage(message *entity.MessageResponse) {
 		Content:  message.Content,
 		SenderId: message.SenderId,
 		Metadata: message.Metadata,
-		User:     sender,
+		User:     *sender,
 	}
 	err = c.common.Database.DB.Create(&msg).Error
 	if err != nil {

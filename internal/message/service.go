@@ -15,7 +15,7 @@ func NewMessageService(common *common.Common) *Service {
 	}
 }
 
-func (s *Service) GetMessages(filter *GetMessagesFilter) ([]entity.MessageResponse, uint64, error) {
+func (s *Service) GetMessages(filter *GetMessagesFilter) ([]entity.Message, uint64, error) {
 	query := s.common.Database.Model(&entity.Message{})
 	query = query.Where("room_id = ?", filter.RoomId)
 	query = query.Order("created_at DESC")
@@ -34,9 +34,9 @@ func (s *Service) GetMessages(filter *GetMessagesFilter) ([]entity.MessageRespon
 		return nil, 0, err
 	}
 
-	var messageResponses []entity.MessageResponse
+	var messageResponses []entity.Message
 	for _, message := range messages {
-		messageResponses = append(messageResponses, entity.MessageResponse{
+		messageResponses = append(messageResponses, entity.Message{
 			ID:       message.ID,
 			RoomId:   message.RoomId,
 			Content:  message.Content,

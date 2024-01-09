@@ -37,20 +37,20 @@ func (s *Service) Register(dto RegisterRequest) (entity.User, error) {
 	return user, nil
 }
 
-func (s *Service) Login(dto LoginRequest) (fiber.Cookie, error) {
+func (s *Service) Login(dto LoginRequest) (fiber.Cookie, *entity.User, error) {
 	var user entity.User
 
 	s.common.Database.Where("email = ?", dto.Email).First(&user) //Check the email is present in the DB
 
 	if user.ID == 0 { //If the ID return is '0' then there is no such email present in the DB
-		return fiber.Cookie{}, &fiber.Error{
+		return fiber.Cookie{}, &entity.User{}, &fiber.Error{
 			Code:    fiber.StatusBadRequest,
 			Message: "email not found",
 		}
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(dto.Password)); err != nil {
-		return fiber.Cookie{}, &fiber.Error{
+		return fiber.Cookie{}, &entity.User{}, &fiber.Error{
 			Code:    fiber.StatusBadRequest,
 			Message: "incorrect password",
 		}
@@ -63,7 +63,7 @@ func (s *Service) Login(dto LoginRequest) (fiber.Cookie, error) {
 
 	token, err := claims.SignedString([]byte(SecretKey))
 	if err != nil {
-		return fiber.Cookie{}, err
+		return fiber.Cookie{}, &entity.User{}, err
 	}
 
 	return fiber.Cookie{
@@ -71,7 +71,7 @@ func (s *Service) Login(dto LoginRequest) (fiber.Cookie, error) {
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 24),
 		HTTPOnly: true,
-	}, nil
+	}, &user, nil
 }
 
 func (s *Service) Logout(userId string) (fiber.Cookie, error) {

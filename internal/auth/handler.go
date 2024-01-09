@@ -48,14 +48,14 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	cookie, err := h.authService.Login(*body)
+	cookie, profile, err := h.authService.Login(*body)
 	if err != nil {
-		return response.BadRequest(ctx, err, nil)
+		return response.Unauthorized(ctx, err)
 	}
 
 	ctx.Cookie(&cookie)
 
-	return response.SendSuccess(ctx, nil)
+	return response.SendSuccess(ctx, profile)
 }
 
 func (h *Handler) Logout(ctx *fiber.Ctx) error {
