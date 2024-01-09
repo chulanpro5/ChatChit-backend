@@ -41,5 +41,5 @@ func Unauthorized(ctx *fiber.Ctx, err error) error {
 
 func BadRequest(ctx *fiber.Ctx, err error, data interface{}) error {
 	zap.L().Info(err.Error())
-	return SendWithCode(ctx, fiber.StatusBadRequest, "malformed data", data, false)
+	return SendWithCode(ctx, fiber.StatusBadRequest, err.Error(), data, false)
 }

@@ -95,21 +95,26 @@ func (h *Handler) AddMember(ctx *fiber.Ctx) error {
 	}
 
 	// Check if user exists
-	roomFound, err := h.userService.GetUser(body.MemberId)
-	if err != nil {
-		return err
-	}
-	if roomFound == nil {
-		return response.BadRequest(ctx, errors.New("user not found"), nil)
-	}
-
-	// Check if room exists
-	userFound, err := h.roomService.GetRoom(fmt.Sprint(ctx.Locals("userId")), ctx.Params("id"))
+	userFound, err := h.userService.GetUser(body.MemberId)
 	if err != nil {
 		return err
 	}
 	if userFound == nil {
+		return response.BadRequest(ctx, errors.New("user not found"), nil)
+	}
+
+	// Check if room exists
+	roomFound, err := h.roomService.GetRoom(fmt.Sprint(ctx.Locals("userId")), ctx.Params("id"))
+	if err != nil {
+		return err
+	}
+	if roomFound == nil {
 		return response.BadRequest(ctx, errors.New("room not found"), nil)
+	}
+
+	// Check room type
+	if roomFound.Type == "private" {
+		return response.BadRequest(ctx, errors.New("room is private"), nil)
 	}
 
 	// Check if user is already a member
@@ -135,8 +140,22 @@ func (h *Handler) RemoveMember(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	// Check if member and room exists
-	member, err := h.roomService.GetMember(ctx.Params("id"), body.MemberId)
+	// Check if room exists
+	roomFound, err := h.roomService.GetRoom(fmt.Sprint(ctx.Locals("userId")), ctx.Params("id"))
+	if err != nil {
+		return err
+	}
+	if roomFound == nil {
+		return response.BadRequest(ctx, errors.New("room not found"), nil)
+	}
+
+	// Check room type
+	if roomFound.Type == "private" {
+		return response.BadRequest(ctx, errors.New("room is private"), nil)
+	}
+
+	// Check if member exists
+	member, err := h.roomService.GetMember(fmt.Sprint(roomFound.ID), body.MemberId)
 	if err != nil {
 		return err
 	}

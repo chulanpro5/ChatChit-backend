@@ -1,6 +1,7 @@
 package response
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
@@ -26,7 +27,8 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 	zap.L().Error(err.Error())
 	code := fiber.StatusInternalServerError
 
-	if e, ok := err.(*fiber.Error); ok {
+	var e *fiber.Error
+	if errors.As(err, &e) {
 		code = e.Code
 	}
 
@@ -34,7 +36,7 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 		return ctx.Status(code).JSON(
 			Messsage{
 				Success:    false,
-				Message:    "Internal Server Error",
+				Message:    err.Error(),
 				StatusCode: code,
 			})
 	} else if code == fiber.StatusUnauthorized {
