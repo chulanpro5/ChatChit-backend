@@ -35,6 +35,29 @@ services:
       - "6379:6379"
     command: redis-server
 
+  db:
+    image: postgres
+    container_name: chatchit-db
+    restart: unless-stopped
+    networks:
+      - chatchit-network
+    volumes:
+      - ./.docker/data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: db
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    networks:
+      - chatchit-network
+    ports:
+      - '8080:8080'
+
 networks:
   chatchit-network:
     external: true

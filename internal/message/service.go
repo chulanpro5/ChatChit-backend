@@ -20,7 +20,7 @@ func NewMessageService(common *common.Common) *Service {
 	}
 }
 
-func (s *Service) GetMessages(filter *GetMessagesFilter) ([]entity.Message, uint64, error) {
+func (s *Service) GetMessages(filter *GetMessagesFilter, languageId string) ([]entity.MessageTranslation, uint64, error) {
 	query := s.common.Database.Model(&entity.Message{})
 	query = query.Where("room_id = ?", filter.RoomId)
 	query = query.Order("created_at DESC")
@@ -39,7 +39,16 @@ func (s *Service) GetMessages(filter *GetMessagesFilter) ([]entity.Message, uint
 		return nil, 0, err
 	}
 
-	return messages, uint64(totalItems), nil
+	var messageTranslations []entity.MessageTranslation
+	for _, message := range messages {
+		messageTranslation, err := s.FetchTranslation(fmt.Sprint(message.ID), languageId)
+		if err != nil {
+			return nil, 0, err
+		}
+		messageTranslations = append(messageTranslations, *messageTranslation)
+	}
+
+	return messageTranslations, uint64(totalItems), nil
 }
 
 func (s *Service) FetchTranslation(messageId string, languageId string) (*entity.MessageTranslation, error) {

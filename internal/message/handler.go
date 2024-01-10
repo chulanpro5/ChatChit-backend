@@ -6,6 +6,7 @@ import (
 	"math"
 	"test-chat/internal/auth"
 	"test-chat/internal/room"
+	"test-chat/internal/user"
 	"test-chat/pkg/common"
 	"test-chat/pkg/entity"
 	"test-chat/pkg/response"
@@ -15,12 +16,13 @@ func NewMessageRouter(router fiber.Router) {
 	handler := NewMessageHandler(common.GetCommon())
 
 	clientRouter := router.Group("/message")
-	clientRouter.Get("/", handler.authService.Middleware, handler.GetMessages)
+	clientRouter.Get("/", handler.authService.Middleware, handler.GetMessageTranslations)
 }
 
 type Handler struct {
 	common         *common.Common
 	messageService *Service
+	userService    *user.Service
 	authService    *auth.Service
 	roomService    *room.Service
 }
@@ -29,12 +31,13 @@ func NewMessageHandler(common *common.Common) *Handler {
 	return &Handler{
 		common:         common,
 		messageService: NewMessageService(common),
+		userService:    user.NewUserService(common),
 		authService:    auth.NewAuthService(common),
 		roomService:    room.NewRoomService(common),
 	}
 }
 
-func (h *Handler) GetMessages(ctx *fiber.Ctx) error {
+func (h *Handler) GetMessageTranslations(ctx *fiber.Ctx) error {
 	userId := fmt.Sprint(ctx.Locals("userId"))
 
 	filter := new(GetMessagesFilter)
@@ -48,7 +51,13 @@ func (h *Handler) GetMessages(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	messages, total, err := h.messageService.GetMessages(filter)
+	// Get user language
+	userFound, err := h.userService.GetUser(userId)
+	if err != nil {
+		return err
+	}
+
+	messages, total, err := h.messageService.GetMessages(filter, fmt.Sprint(userFound.LanguageId))
 	if err != nil {
 		return err
 	}
