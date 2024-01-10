@@ -32,6 +32,7 @@ func (s *Service) Register(dto RegisterRequest) (entity.User, error) {
 		Email:              dto.Email,
 		Password:           password,
 		ProfileImageBase64: util.ImageToBase64(util.GenerateAvatar(dto.Email)),
+		LanguageId:         25,
 	}
 
 	s.common.Database.Create(&user)
