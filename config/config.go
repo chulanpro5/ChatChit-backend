@@ -6,9 +6,10 @@ import (
 )
 
 type Config struct {
-	App      App
-	Database Database
-	Redis    Redis
+	App         App
+	Database    Database
+	Redis       Redis
+	Translation Translation
 }
 
 func LoadConfig() (*Config, error) {

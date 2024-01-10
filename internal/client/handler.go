@@ -56,7 +56,7 @@ func (h *Handler) HandleWebSocketConnection(c *websocket.Conn) {
 	cl := &Client{
 		Common:  h.common,
 		Conn:    c,
-		Message: make(chan *entity.Message, 10),
+		Message: make(chan *entity.MessageTranslation, 10),
 		Id:      c.Params("id"),
 	}
 

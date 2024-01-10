@@ -40,7 +40,7 @@ func (b *Service) Run() {
 	ch := pubsub.Channel()
 
 	for msg := range ch {
-		fmt.Println(msg.Channel, msg.Payload)
+		zap.L().Info(fmt.Sprint(msg.Channel, msg.Payload))
 		// parse message to JSON
 		var message entity.Message
 		err := json.Unmarshal([]byte(msg.Payload), &message)

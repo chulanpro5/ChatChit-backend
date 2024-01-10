@@ -13,7 +13,7 @@ import (
 type Client struct {
 	Common  *common.Common
 	Conn    *websocket.Conn
-	Message chan *entity.Message
+	Message chan *entity.MessageTranslation
 	Id      string `json:"id"`
 }
 

@@ -123,8 +123,6 @@ func (h *Handler) FindUserByEmail(ctx *fiber.Ctx) error {
 		return response.BadRequest(ctx, err, nil)
 	}
 
-	fmt.Println(friend)
-
 	return response.SendSuccess(ctx, FindUserByEmailResponse{
 		IsFriendAdded: isAdded,
 		User:          friend,

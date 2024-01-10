@@ -164,6 +164,7 @@ func (s *Service) GetMembers(roomId string) ([]entity.User, error) {
 		Table("users").
 		Joins("JOIN room_members ON room_members.user_id = users.id").
 		Where("room_members.room_id = ? AND room_members.deleted_at IS NULL", roomId).
+		Preload("Language").
 		Find(&members).Error
 
 	if err != nil {

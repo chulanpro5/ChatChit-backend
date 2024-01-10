@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
+	"test-chat/internal/message"
 	"test-chat/internal/room"
 	"test-chat/internal/user"
 	"test-chat/pkg/common"
@@ -12,25 +13,27 @@ import (
 )
 
 type Service struct {
-	common      *common.Common
-	roomService *room.Service
-	userService *user.Service
-	hub         *Hub
+	common         *common.Common
+	roomService    *room.Service
+	userService    *user.Service
+	messageService *message.Service
+	hub            *Hub
 }
 
 func NewClientService(common *common.Common) *Service {
 	return &Service{
-		common:      common,
-		roomService: room.NewRoomService(common),
-		userService: user.NewUserService(common),
-		hub:         GetHubInstance(),
+		common:         common,
+		roomService:    room.NewRoomService(common),
+		userService:    user.NewUserService(common),
+		messageService: message.NewMessageService(common),
+		hub:            GetHubInstance(),
 	}
 }
 
 func (c *Service) BroadcastMessage(message *entity.Message) error {
 	// Find the client with the given id
-	fmt.Println("BroadcastToRoom")
-	fmt.Println(message)
+	zap.L().Info("BroadcastToRoom")
+	zap.L().Info(message.Content)
 
 	members, err := c.roomService.GetMembers(fmt.Sprint(message.RoomId))
 	if err != nil {
@@ -45,7 +48,10 @@ func (c *Service) BroadcastMessage(message *entity.Message) error {
 			zap.L().Debug(fmt.Sprintf("Client not found: %s", err.Error()))
 			continue
 		}
-		receiverClient.Message <- message
+		// Translate to receiver language
+		translatedMessage, err := c.messageService.GetMessageTranslations(fmt.Sprint(message.ID), fmt.Sprint(receiver.Language.ID))
+
+		receiverClient.Message <- translatedMessage
 
 		zap.L().Debug(fmt.Sprintf("Message sent to client: %s", receiverClient.Id))
 	}
