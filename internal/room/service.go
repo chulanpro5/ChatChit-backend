@@ -115,6 +115,10 @@ func (s *Service) GetRooms(userId string) ([]WithLastMessage, error) {
 		return roomsWithLastMessage[i].LastMessage.CreatedAt.After(roomsWithLastMessage[j].LastMessage.CreatedAt)
 	})
 
+	if roomsWithLastMessage == nil {
+		roomsWithLastMessage = []WithLastMessage{}
+	}
+
 	return roomsWithLastMessage, nil
 }
 
