@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"strconv"
 	"test-chat/pkg/common"
 	"test-chat/pkg/entity"
@@ -24,10 +26,22 @@ func NewAuthService(common *common.Common) *Service {
 }
 
 func (s *Service) Register(dto RegisterRequest) (entity.User, error) {
+	var user entity.User
+	result := s.common.Database.Where("email = ?", dto.Email).First(&user)
+	if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return entity.User{}, &fiber.Error{
+			Code:    fiber.StatusBadRequest,
+			Message: "email already registered",
+		}
+	}
+
+	if result.Error != nil {
+		return entity.User{}, result.Error
+	}
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), 14) //GenerateFromPassword returns the bcrypt hash of the password at the given cost i.e.
 
-	user := entity.User{
+	user = entity.User{
 		Name:               dto.Name,
 		Email:              dto.Email,
 		Password:           password,
