@@ -71,7 +71,7 @@ func (s *Service) GetRooms(userId string) ([]WithLastMessage, error) {
 		return nil, err
 	}
 
-	// For each room, assign friend name to room name
+	// For each room, assign friend info to room name
 	for i, room := range rooms {
 		if room.Type == "group" {
 			continue
@@ -82,6 +82,7 @@ func (s *Service) GetRooms(userId string) ([]WithLastMessage, error) {
 		}
 		if member != nil {
 			rooms[i].Name = member.Name
+			rooms[i].ImageBase64 = member.ProfileImageBase64
 		}
 	}
 
