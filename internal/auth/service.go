@@ -35,10 +35,6 @@ func (s *Service) Register(dto RegisterRequest) (entity.User, error) {
 		}
 	}
 
-	if result.Error != nil {
-		return entity.User{}, result.Error
-	}
-
 	password, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), 14) //GenerateFromPassword returns the bcrypt hash of the password at the given cost i.e.
 
 	user = entity.User{
